@@ -42,6 +42,11 @@
       <div class="card" onclick="playCard('two', 'paper')">Paper: <span class="paper"></span></div>
       <div class="card" onclick="playCard('two', 'scissors')">Scissors: <span class="scissors"></span></div>
     </div>
+    <div class="battle-ground">
+      <div class="card one"></div>
+      <div class="card two"></div>
+      <div class="score"></div>
+    </div>
   </div>
 
 
@@ -50,44 +55,65 @@
   <script>
     const HANDSIZE = 6;
     const BASEHAND = { rock: 2, paper: 2, scissors: 2 };
+    const INITIALSTATE = { score: 0, playerOne: [false, ""], playerTwo: [false, ""] };
 
     const handOne = Object.assign({}, BASEHAND),
       handTwo = Object.assign({}, BASEHAND);
 
-    const calculateOutcome = (one, two) => {
-      let result;
+    const gameState = Object.assign({}, INITIALSTATE);
 
-      if (one === two) {
-        result = 0;
-      } else if ((one === "rock" && two === "scissors") ||
-        (one === "scissors" && two === "paper") ||
-        (one === "paper" && two === "rock")) {
-        result = 1;
-      } else {
-        result = -1;
-      }
-
-      return result;
+    const initializeBoard = () => {
+      $('.one .rock')[0].innerText = handOne.rock;
+      $('.one .paper')[0].innerText = handOne.paper;
+      $('.one .scissors')[0].innerText = handOne.scissors;
+      $('.two .rock')[0].innerText = handOne.rock;
+      $('.two .paper')[0].innerText = handOne.paper;
+      $('.two .scissors')[0].innerText = handOne.scissors;
     }
 
     const playCard = (player, card) => {
-      if (player === "one") {
-        handOne[card] -= 1;
-      } else {
-        handTwo[card] -= 1;
+      const calculateOutcome = (one, two) => {
+        let result;
+
+        if (one === two) {
+          result = 0;
+        } else if ((one === "rock" && two === "scissors") ||
+          (one === "scissors" && two === "paper") ||
+          (one === "paper" && two === "rock")) {
+          result = 1;
+        } else {
+          result = -1;
+        }
+
+        return result;
       }
 
-      return [player, card];
+      const updateBoard = () => {
+        initializeBoard();
+        $('.battle-ground .one')[0].innerText = gameState.playerOne[1];
+        $('.battle-ground .two')[0].innerText = gameState.playerTwo[1];
+        $('.battle-ground .score')[0].innerText = gameState.score;
+        gameState.playerOne = [false, ""];
+        gameState.playerTwo = [false, ""];
+      }
+
+      if (player === "one") {
+        handOne[card] -= 1;
+        gameState.playerOne = [true, card];
+      } else {
+        handTwo[card] -= 1;
+        gameState.playerTwo = [true, card];
+      }
+
+      if (gameState.playerOne[0] === true && gameState.playerTwo[0] === true) {
+        gameState.score += calculateOutcome(gameState.playerOne[1], gameState.playerTwo[1]);
+        updateBoard();
+      }
     }
 
-    $('.one .rock')[0].innerText = handOne.rock;
-    $('.one .paper')[0].innerText = handOne.paper;
-    $('.one .scissors')[0].innerText = handOne.scissors;
-    $('.two .rock')[0].innerText = handOne.rock;
-    $('.two .paper')[0].innerText = handOne.paper;
-    $('.two .scissors')[0].innerText = handOne.scissors;
+    // Execute code here.
 
-
+    initializeBoard();
   </script>
 </body>
 
